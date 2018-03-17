@@ -1,0 +1,43 @@
+#!/usr/bin/env php
+
+<?php include_once 'vendor/autoload.php';
+
+$cmd = new \Commando\Command();
+
+$cmd->option('i')
+	->require()
+	->aka('in')
+	->file()
+	->describedAs('Folder of templates to scan');
+
+$cmd->option('o')
+	->require()
+	->aka('out')
+	->describedAs('The name of the .pot file to generate');
+
+$templates = new RegexIterator(
+	new RecursiveIteratorIterator(
+	new RecursiveDirectoryIterator($cmd['in']),
+	RecursiveIteratorIterator::SELF_FIRST
+), '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+
+// Adds Wordpress _e() support
+\Gettext\Extractors\PhpCode::$options['functions']['_e'] = 'gettext';
+
+foreach ($templates as $template) {
+	$file = end($template);
+
+	if (!isset($translations)) {
+		$translations = \Gettext\Translations::fromPhpCodeFile($template);
+		continue;
+	}
+
+	$translations->mergeWith(
+		\Gettext\Translations::fromPhpCodeFile($template)
+	);
+}
+
+$translations->toPoFile($cmd['out']);
+
+echo($translations->count() . ' translatable strings found') . PHP_EOL;
+echo('Saved to ' . $cmd['out']) . PHP_EOL;

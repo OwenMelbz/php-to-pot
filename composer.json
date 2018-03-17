@@ -1,0 +1,17 @@
+{
+    "name": "owenmelbz/php-to-pot",
+    "description": "Creates a .pot file for translations based off a directory of php files",
+    "type": "library",
+    "require": {
+        "gettext/gettext": "4.*",
+        "nategood/commando": "0.2.*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Owen",
+            "email": "owenmelbz@gmail.com"
+        }
+    ],
+    "bin": ["bin/php-to-pot.php"]
+}
